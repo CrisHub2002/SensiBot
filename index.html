@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="SensiBot analiza el tono de un mensaje con un modelo de Machine Learning for Kids: halago, insulto, pregunta o neutro." />
+  <meta name="theme-color" content="#f7f5ff" />
+  <title>SensiBot — Descubre el tono de tus mensajes</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%236a4dff'/%3E%3Cstop offset='1' stop-color='%23ff7a90'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='28' fill='url(%23g)'/%3E%3Cpath d='M26 34a10 10 0 0 1 10-10h28a10 10 0 0 1 10 10v18a10 10 0 0 1-10 10H46L32 74V62h4a10 10 0 0 1-10-10V34Z' fill='white'/%3E%3Ccircle cx='42' cy='43' r='4' fill='%236a4dff'/%3E%3Ccircle cx='58' cy='43' r='4' fill='%236a4dff'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true">
+    <span class="orb orb-one"></span>
+    <span class="orb orb-two"></span>
+    <span class="orb orb-three"></span>
+  </div>
+
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="SensiBot, inicio">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M7 10.5A4.5 4.5 0 0 1 11.5 6h9A4.5 4.5 0 0 1 25 10.5v6a4.5 4.5 0 0 1-4.5 4.5H15l-5 4v-4.2A4.5 4.5 0 0 1 7 16.5v-6Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="12.5" cy="13.5" r="1.4" fill="currentColor"/>
+            <circle cx="19.5" cy="13.5" r="1.4" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="brand-name">Sensi<span>Bot</span></span>
+      </a>
+
+      <div class="model-status" id="model-status" data-state="loading" role="status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="model-status-text">Comprobando modelo…</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>Clasificador de texto con IA</p>
+        <h1>Descubre el tono de <span class="gradient-text">tus palabras.</span></h1>
+        <p class="lede">
+          Escribe un mensaje y SensiBot te dirá si suena a halago, insulto, pregunta
+          o si es un mensaje neutro.
+        </p>
+      </section>
+
+      <section class="app-card" aria-label="Analizador de mensajes">
+        <div class="input-pane">
+          <form id="analyze-form" novalidate>
+            <label for="message">Escribe tu mensaje</label>
+            <div class="textarea-wrap">
+              <textarea
+                id="message"
+                name="message"
+                maxlength="500"
+                rows="5"
+                placeholder="Ejemplo: Me encanta tu trabajo"
+                autocomplete="off"
+                spellcheck="true"
+              ></textarea>
+              <span class="counter" id="counter">0 / 500</span>
+            </div>
+
+            <p class="field-error" id="field-error" role="alert" hidden></p>
+
+            <button type="submit" class="analyze-btn" id="analyze-btn" disabled>
+              <span id="button-label">Analizar mensaje</span>
+              <span class="spinner" aria-hidden="true"></span>
+              <svg class="button-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 12h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </form>
+
+          <div class="examples">
+            <p class="examples-title">Prueba con un ejemplo</p>
+            <div class="example-list">
+              <button type="button" class="example" data-text="Me encanta tu trabajo">Me encanta tu trabajo</button>
+              <button type="button" class="example" data-text="Eres un desastre">Eres un desastre</button>
+              <button type="button" class="example" data-text="¿Puedes ayudarme?">¿Puedes ayudarme?</button>
+              <button type="button" class="example" data-text="Hola, buenos días">Hola, buenos días</button>
+            </div>
+          </div>
+
+          <p class="privacy-note">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 3 5 6v5c0 4.4 2.8 8.4 7 10 4.2-1.6 7-5.6 7-10V6l-7-3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+              <path d="m9.3 12 1.8 1.8 3.6-3.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            El texto se envía al modelo de Machine Learning for Kids.
+          </p>
+        </div>
+
+        <div class="result-pane" id="result-pane" aria-live="polite">
+          <div class="result-state" id="result-idle">
+            <div class="idle-stack" aria-hidden="true">
+              <span>😊</span>
+              <span>😠</span>
+              <span>❓</span>
+              <span>😐</span>
+            </div>
+            <h2 id="idle-title">Tu análisis aparecerá aquí</h2>
+            <p id="idle-text">Escribe un mensaje y pulsa <strong>Analizar mensaje</strong> para empezar.</p>
+          </div>
+
+          <div class="result-state" id="result-loading" hidden>
+            <span class="loader" aria-hidden="true"></span>
+            <h2>Analizando el mensaje…</h2>
+            <p>Estamos consultando el modelo de Machine Learning for Kids.</p>
+          </div>
+
+          <div class="result-state" id="result-error" hidden>
+            <span class="state-icon" aria-hidden="true">!</span>
+            <h2>No se pudo analizar</h2>
+            <p id="result-error-text">Inténtalo de nuevo en unos segundos.</p>
+          </div>
+
+          <div class="result-content" id="result-content" hidden>
+            <p class="result-kicker">Tono detectado</p>
+
+            <div class="top-result" id="top-result" data-tone="neutro">
+              <span class="top-emoji" id="top-emoji" aria-hidden="true">😐</span>
+              <div class="top-copy">
+                <h2 id="top-label">Neutro</h2>
+                <p class="top-description" id="top-description">Un mensaje sin una carga emocional clara.</p>
+                <p class="top-confidence"><strong id="top-confidence">—</strong> de confianza</p>
+              </div>
+              <span class="top-spark" aria-hidden="true">✦</span>
+            </div>
+
+            <p class="low-confidence" id="low-confidence" hidden>
+              La confianza es baja. Prueba con una frase más clara o más parecida a los ejemplos.
+            </p>
+
+            <div class="breakdown">
+              <div class="breakdown-heading">
+                <h3>Desglose del modelo</h3>
+                <span>Confianza</span>
+              </div>
+              <ul class="prediction-list" id="prediction-list"></ul>
+            </div>
+
+            <p class="result-note">
+              <span class="result-note-dot" aria-hidden="true"></span>
+              Analizado por el modelo de Machine Learning for Kids.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Modelo entrenado con <a href="https://machinelearningforkids.co.uk/" target="_blank" rel="noopener noreferrer">Machine Learning for Kids</a>.</p>
+      <p>El API key permanece en el servidor y no se envía al navegador.</p>
+    </footer>
+  </div>
+
+  <noscript>
+    <div class="noscript">Necesitas activar JavaScript para usar SensiBot.</div>
+  </noscript>
+
+  <script src="app.js"></script>
+</body>
+</html>
